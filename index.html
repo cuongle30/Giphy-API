@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Countries Giphy</title>
+  <style type="text/css">
+    button,
+    div,
+    form,
+    input {
+      margin: 10px;
+    }
+  </style>
+  <link rel="stylesheet" type="text/css" href="assets/css/style.css">
+</head>
+<body>
+
+  <div class="container">
+    <div id="buttons-view"></div>
+
+    <form id="submit-form">
+      <label for="submit-input"><strong>Add a Country</strong></label>
+      <input type="text" id="submit-input"><br>
+      <!-- Button triggers new submit to be added -->
+      <input id="submit-topic" type="submit" value="Submit Country">
+    </form>
+    <hr>
+    <div id="gifs-appear-here"></div>
+
+    <script type="text/javascript">
+      
+      var topics = ["United States", "Mexico", "China", "Japan"];
+
+    // Generic function for capturing the submit name from the data-attribute
+      function addTopic() {
+        if (this.classList.contains("submit")) {
+          var topicName = this.dataset.name;
+        } else { 
+          return; }
+      }
+      // Function for displaying submit data
+      function renderButtons() {
+
+        // Deleting the topics prior to adding new topics
+        // (this is necessary otherwise we will have repeat buttons)
+        document.querySelector("#buttons-view").innerHTML = "";
+
+        // Looping through the array of topics
+        for (let submit of topics) {
+          // Then dynamicaly generating buttons for each submit in the array
+          var a = document.createElement("button");
+          
+          // Adding a class of submit to our button
+          a.classList.add("submit");
+          // Adding a data-attribute
+          a.setAttribute("data-name", submit);
+          // Providing the initial button text
+          a.innerText = submit;
+          // Adding the button to the HTML
+          document.querySelector("#buttons-view").appendChild(a);
+        }
+      }
+      // This function handles events where one button is clicked
+      document.querySelector("#submit-topic").addEventListener("click", (event) => addSubmitHandler(event));
+      var addSubmitHandler = (event) => {
+        // Preventing the buttons default behavior when clicked (which is submitting a form)
+        event.preventDefault();
+        // This line grabs the input from the textbox
+        var submit = document.querySelector("#submit-input").value.trim();
+
+        // Adding the submit from the textbox to our array
+        topics.push(submit);
+        // Calling renderButtons which handles the processing of our submit array
+        renderButtons();
+      };
+      
+      document.querySelector(".container").addEventListener("click", function(event) { 
+      if (event.target.tagName == "BUTTON") {
+      // Variable to grab data from inside button
+      var country = event.target.innerText
+      // Constructing a queryURL using the animal name
+      var queryURL = `https://api.giphy.com/v1/gifs/search?q=${country}&api_key=dc6zaTOxFJmzC&limit=10`;
+      
+        console.log(queryURL)
+      // Performing a request with the queryURL
+      fetch(queryURL, {
+        method: "GET"
+      })
+        // After data comes back from the request
+        .then(function(response) { return response.json() })
+        .then(function(response) {
+          console.log(queryURL);
+
+          console.log(response);
+          // storing the data from the AJAX request in the results variable
+          var results = response.data;
+
+          // Looping through each result item
+          for (let item of results) {
+
+            // Creating and storing a div tag
+            var countryDiv = document.createElement("div");
+
+            // Creating a paragraph tag with the result item's rating
+            var p = document.createElement("p")
+            p.innerText = `Rating: ${item.rating}`;
+
+            // Creating and storing an image tag
+            var countryImage = document.createElement("img");
+            // Setting the src attribute of the image to a property pulled off the result item
+            
+            countryImage.setAttribute("src", item.images.fixed_height_still.url);
+            countryImage.setAttribute("data-still", item.images.fixed_height_still.url);
+            countryImage.setAttribute("data-animate", item.images.fixed_height.url);
+            countryImage.setAttribute("data-state", "still");
+            countryImage.classList.add("image");
+
+            // Appending the paragraph and image, tag to the countryDiv
+            countryDiv.appendChild(p);
+            countryDiv.appendChild(countryImage);
+
+            // Prependng the countryDiv to the HTML page in the "#gifs-appear-here" div
+            let gifContainer = document.querySelector("#gifs-appear-here");
+            gifContainer.prepend(countryDiv);
+          }
+        });
+        }
+    })
+      // Calling the renderButtons function to display the intial buttons
+      renderButtons();
+      //Click event to play and pause Gif
+      document.querySelector(".container").addEventListener("click", function(event) {
+            let currentImg = event.target
+            var state = currentImg.dataset.state
+            if (state === 'still') {
+              currentImg.setAttribute('src', currentImg.dataset.animate)
+              currentImg.setAttribute('data-state', 'animate')
+            } else {
+              currentImg.setAttribute('src', currentImg.dataset.still)
+              currentImg.setAttribute('data-state', 'still')
+        }
+      })
+
+    </script>
+  </div>
+</body>
+
+</html>
