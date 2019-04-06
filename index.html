@@ -31,13 +31,6 @@
       
       var topics = ["United States", "Mexico", "China", "Japan"];
 
-    // Generic function for capturing the submit name from the data-attribute
-      function addTopic() {
-        if (this.classList.contains("submit")) {
-          var topicName = this.dataset.name;
-        } else { 
-          return; }
-      }
       // Function for displaying submit data
       function renderButtons() {
 
@@ -80,7 +73,7 @@
       var country = event.target.innerText
       // Constructing a queryURL using the animal name
       var queryURL = `https://api.giphy.com/v1/gifs/search?q=${country}&api_key=dc6zaTOxFJmzC&limit=10`;
-      
+
         console.log(queryURL)
       // Performing a request with the queryURL
       fetch(queryURL, {
@@ -94,7 +87,9 @@
           console.log(response);
           // storing the data from the AJAX request in the results variable
           var results = response.data;
-
+          //Storing Variable to where Gif appear and clear content
+          var gifContainer = document.querySelector("#gifs-appear-here");
+          gifContainer.innerHTML = "";
           // Looping through each result item
           for (let item of results) {
 
@@ -120,7 +115,6 @@
             countryDiv.appendChild(countryImage);
 
             // Prependng the countryDiv to the HTML page in the "#gifs-appear-here" div
-            let gifContainer = document.querySelector("#gifs-appear-here");
             gifContainer.prepend(countryDiv);
           }
         });
